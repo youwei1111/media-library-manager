@@ -14,7 +14,8 @@ A full-stack media management system with API integration for movies, books, and
 * **Backend**: PHP, Python (Requests, PyMySQL)
 * **Database**: MySQL
 
-🛠️ Installation & Setup
+## 🛠️ Installation & Setup
+
 1. Clone the repository.
 2. Create db_config.php from db_config.sample.php and enter your database credentials.
 3. Create config.py from config.sample.py and add your TMDB API Key.
