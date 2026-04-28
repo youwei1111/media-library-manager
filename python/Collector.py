@@ -4,12 +4,12 @@ import sys
 import json
 
 # 1. 数据库配置
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',  # XAMPP 默认密码为空
-    'database': 'media_library_system'
-}
+try:
+    from config import DB_CONFIG, TMDB_API_KEY
+except ImportError:
+    # 如果没配置，给个默认值或者报错提示
+    print("请先根据 config.sample.py 创建 config.py")
+    sys.exit(1)
 
 # --- 功能函数：抓取多个候选结果 ---
 
