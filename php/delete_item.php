@@ -1,6 +1,7 @@
 <?php
 // delete_item.php
-$conn = new mysqli("localhost", "root", "", "media_library_system");
+include 'db_config.php';
+
 $id = $_POST['id'] ?? 0;
 
 if ($id > 0) {
