@@ -9,8 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $json_data = json_encode($item_data, JSON_UNESCAPED_UNICODE);
 
-    $python_path = "/Users/3dyson_1225/Media_Library_System/venv/bin/python3";
-    $script_path = "/Users/3dyson_1225/Media_Library_System/VSCode/python/Collector.py";
+    $python_path = "./Media_Library_System/venv/bin/python3";
+    $script_path = "./Media_Library_System/VSCode/python/Collector.py";
     
     $command = "\"$python_path\" \"$script_path\" --add " . escapeshellarg($json_data) . " 2>&1";
     
