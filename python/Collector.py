@@ -17,7 +17,7 @@ def get_search_results(name, media_type):
     results = []
     
     if media_type in ['movie', 'tv', 'show', 'anime']:
-        api_key = "57e82c8a91b54f2fb743ef8f5133061b" 
+        api_key = "YOUR_API_KEY_HERE" 
         url = f"https://api.themoviedb.org/3/search/multi?api_key={api_key}&query={name}&language=zh-CN"
         try:
             res = requests.get(url, timeout=10).json()
