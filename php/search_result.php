@@ -1,9 +1,6 @@
 <?php
 // --- 1. 数据库连接 ---
-$conn = new mysqli("localhost", "root", "", "media_library_system");
-if ($conn->connect_error) { 
-    die("连接失败: " . $conn->connect_error); 
-}
+include 'db_config.php';
 
 $name = $_POST['name'] ?? '';
 $type = $_POST['type'] ?? '';
