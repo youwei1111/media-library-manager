@@ -1,0 +1,334 @@
+/* =========================================
+   1. 基础变量与主题切换 (全系统适配)
+   ========================================= */
+:root {
+    --bg-color: #f0f2f5;
+    --card-bg: #ffffff;
+    --text-main: #2c3e50;
+    --text-muted: #7f8c8d;
+    --border-color: #e0e0e0;
+    --input-bg: #fdfdfd;
+    --nav-bg: #ffffff;
+    --success-color: #2ecc71;
+    --accent-color: #3498db;
+    --uptodate-color: #9b59b6; /* 追平状态专属紫色 */
+    --shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+[data-theme='dark'] {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-main: #e0e0e0;
+    --text-muted: #95a5a6;
+    --border-color: #333333;
+    --input-bg: #262626;
+    --nav-bg: #1e1e1e;
+    --shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+html { scroll-behavior: smooth; }
+body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    padding: 20px;
+    margin: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* 强制修正链接颜色 */
+a { text-decoration: none; color: inherit !important; }
+
+/* =========================================
+   2. 顶部搜索栏美化
+   ========================================= */
+.nav-section {
+    background: var(--nav-bg);
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.nav-section h3 { 
+    margin: 0 0 15px 0; 
+    font-size: 18px; 
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-form {
+    display: grid;
+    grid-template-columns: 1fr 200px 140px; 
+    gap: 15px;
+}
+
+.search-form input, .search-form select {
+    height: 46px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0 15px;
+    background: var(--input-bg);
+    color: var(--text-main);
+    font-size: 15px;
+    transition: all 0.2s;
+}
+
+.search-form input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+.search-form button {
+    height: 46px;
+    background: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.search-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+/* =========================================
+   3. 过滤器与状态栏 (已调整间距)
+   ========================================= */
+.nav { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.nav-link {
+    padding: 6px 14px;
+    background: var(--bg-color);
+    border-radius: 20px;
+    font-size: 13px;
+    border: 1px solid transparent;
+    transition: 0.2s;
+}
+.nav-link.active {
+    background: var(--accent-color);
+    color: #fff !important;
+}
+
+.status-bar {
+    margin: 0 0 20px 5px; /* 显著增加底部间距 */
+    padding: 5px 15px;
+    font-size: 14px;
+    border-left: 4px solid var(--success-color);
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
+}
+.status-bar strong { font-size: 18px; color: #e74c3c; }
+
+/* =========================================
+   4. 卡片与海报修复
+   ========================================= */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s, border-color 0.3s;
+    position: relative;
+}
+
+.card:hover { transform: translateY(-5px); }
+
+.poster-container {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    background-color: var(--input-bg); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.poster-container img { 
+    max-width: 90%; 
+    max-height: 90%; 
+    object-fit: contain; 
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* 标签样式 */
+.type-tag {
+    position: absolute; bottom: 10px; right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff !important;
+    padding: 3px 8px; font-size: 11px; border-radius: 4px; z-index: 5;
+}
+
+.update-badge {
+    position: absolute; top: 10px; left: 10px;
+    background: #e74c3c;
+    color: #fff !important;
+    padding: 4px 10px; font-size: 11px; font-weight: bold; border-radius: 4px; z-index: 5;
+}
+
+/* =========================================
+   5. 表单与集数
+   ========================================= */
+.info { 
+    padding: 18px; 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; box-sizing: 
+    border-box !important;
+    flex: 1 !important; 
+    min-height: 180px;
+}
+
+.item-title { font-size: 16px; margin: 0; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+.rating-small { color: #f39c12; font-size: 14px; }
+
+.input-style, .day-select {
+    width: 100%; height: 38px; padding: 5px 12px;
+    border-radius: 8px; border: 1px solid var(--border-color);
+    background: var(--input-bg); color: var(--text-main);
+    font-size: 13px; margin-bottom: 5px;
+}
+
+/* 针对备注框的溢出修复 */
+.remarks-input {
+    width: 100% !important; 
+    box-sizing: border-box !important; /* 强制内边距不撑大宽度 */
+    max-width: 100% !important;
+    display: block;
+    flex-grow: 1 !important;
+}
+
+.ep-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.ep-input-wrapper { position: relative; width: 85px; }
+
+.ep-input {
+    width: 100%; height: 38px;
+    padding-left: 35px !important; 
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-main);
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.mini-plus-btn {
+    position: absolute; left: 6px; top: 50%;
+    transform: translateY(-50%);
+    background: var(--success-color);
+    color: white !important;
+    border: none; border-radius: 5px;
+    width: 26px; height: 26px;
+    font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.progress-container { background: rgba(0,0,0,0.1); height: 8px; border-radius: 10px; margin: 10px 0 10px 0; overflow: hidden; }
+.progress-bar { background: linear-gradient(90deg, var(--success-color), #27ae60); height: 100%; transition: 0.4s; }
+
+/* =========================================
+   6. 状态特有样式 (追平、已看、在看)
+   ========================================= */
+/* 在看状态 */
+.card.status-watching { border: 2px solid var(--success-color); }
+
+/* 已看状态 */
+.card.status-done { opacity: 0.6; filter: grayscale(0.5); }
+
+/* 追平状态 (B方案) */
+.card.status-uptodate { border: 2px solid var(--uptodate-color); }
+.card.status-uptodate::before {
+    content: "UP TO DATE";
+    position: absolute;
+    top: 10px; left: 10px;
+    background: var(--uptodate-color);
+    color: white !important;
+    font-size: 10px; font-weight: bold;
+    padding: 3px 8px; border-radius: 4px;
+    z-index: 10;
+}
+/* 追平时隐藏原本的更新标签，避免重叠 */
+.card.status-uptodate .update-badge { display: none; }
+
+/* 当卡片处于追平状态时，强制进度条满格 */
+.card.status-uptodate .progress-bar {
+    width: 100% !important;
+    background: linear-gradient(90deg, var(--uptodate-color), #8e44ad) !important; /* 换成紫色系更丝滑 */
+}
+
+/* 2. 隐藏集数输入区域 (包含 +1 按钮、数字框、斜杠和总集数) */
+.card.status-uptodate .ep-row {
+    display: none !important;
+}
+
+/* =========================================
+   7. 底部操作与链接展开
+   ========================================= */
+.card-footer {
+    padding: 10px 5px 0px 5px;
+    border-top: 1px solid var(--border-color);
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: auto !important; /* 自动外边距会将 footer 推至最下 */
+    background: var(--card-bg);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.link-wrapper { display: flex; align-items: center; flex-grow: 1; }
+
+.link-input.hidden-input {
+    width: 0; opacity: 0; padding: 0; margin: 0;
+    overflow: hidden; transition: all 0.3s ease; border: none;
+}
+
+.link-input.show {
+    width: 100%; opacity: 1; margin-left: 10px;
+    padding: 6px 12px; border: 1px dashed var(--accent-color);
+}
+
+.link-toggle-btn {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    padding: 6px 10px; border-radius: 8px; cursor: pointer;
+}
+
+.delete-icon-btn { color: #ccc; font-size: 18px; margin-left: 15px; transition: 0.2s; }
+/* style.css */
+.delete-icon-btn:hover {
+    color: #e74c3c !important;
+    transform: scale(1.2);
+    transition: all 0.2s;
+}
+
+/* =========================================
+   8. 固定浮动按钮
+   ========================================= */
+.fixed-actions {
+    position: fixed; bottom: 30px; right: 30px;
+    display: flex; flex-direction: column; gap: 15px;
+    z-index: 100;
+}
+.fixed-actions button {
+    width: 50px; height: 50px; border-radius: 50%;
+    border: none; background: var(--card-bg); color: var(--text-main);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer;
+    font-size: 20px; transition: 0.2s;
+}
+.fixed-actions button:hover { transform: scale(1.1); }
