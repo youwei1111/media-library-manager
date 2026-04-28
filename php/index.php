@@ -1,8 +1,7 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-$conn = new mysqli("localhost", "root", "", "media_library_system");
-if ($conn->connect_error) { die("连接失败: " . $conn->connect_error); }
+include 'db_config.php';
 
 // --- 逻辑处理 ---
 $type_filter = $_GET['type'] ?? '';     
