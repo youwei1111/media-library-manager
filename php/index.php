@@ -105,15 +105,15 @@ if ($result) {
     <div class="nav-section">
         <h3>Add New Entry</h3>
         <form action="search_result.php" method="POST" class="search-form">
-            <input type="text" name="name" placeholder="Search title..." required>
-            <select name="type">
+            <select name="type" id="media-type-select">
                 <option value="movie">Movie</option>
-                <option value="tv">TV Series</option>
-                <option value="show">Variety Show</option>
-                <option value="manga">Manga</option>
+                <option value="tv">TV Show</option>
                 <option value="anime">Anime</option>
-                <option value="book">Book</option>
+                <option value="book">Book</option> 
+                <option value="manga">Manga</option>
             </select>
+
+            <input type="text" name="name" id="search-input" placeholder="🔍 Enter the title..." required>
             <button type="submit">Search & Confirm</button>
         </form>
     </div>
@@ -166,7 +166,11 @@ if ($result) {
                         <?php if ($row['update_day'] == $today_day && $row['status'] == '在看'): ?>
                             <div class="update-badge">🔥 Updates Today (<?php echo $day_names[$today_day]; ?>)</div>
                         <?php endif; ?>
-                        <img src="<?php echo $row['poster_url'] ?: 'https://via.placeholder.com/200x280?text=No+Image'; ?>" alt="Poster">
+                        <?php if (!empty($row['poster_url'])): ?>
+                            <img src="<?= $row['poster_url'] ?>" alt="Poster">
+                        <?php else: ?>
+                            <div class="no-poster"No Poster"</div>
+                        <?php endif; ?>
                         <div class="type-tag"><?php echo strtoupper($row['type']); ?></div>
                     </div>
                 </a>
