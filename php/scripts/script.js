@@ -1,9 +1,10 @@
 /**
- * 我的收藏库 - 核心交互逻辑 (最终修正版)
+ * Media Library Manager - Core Interaction Logic (Final Version)
+ * Author: You Wei
  */
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. 核心配置与工具函数 ---
+    // --- 1. Core Configuration & Utility Functions ---
     
     const UI = {
         themeAttr: 'data-theme',
@@ -11,23 +12,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * 通用 AJAX 数据提交
+     * Universal AJAX Data Synchronization
+     * Sends updated item data to the backend without refreshing the page
      */
     async function updateData(params) {
         const query = new URLSearchParams({ ...params, ajax: 1 }).toString();
         try {
             const response = await fetch(`update_item.php?${query}`);
-            if (!response.ok) throw new Error('提交失败');
-            console.log('✅ 同步成功:', params);
+            if (!response.ok) throw new Error('Network response was not ok');
+            console.log('✅ Sync Successful:', params);
             return true;
         } catch (error) {
-            console.error('❌ AJAX 错误:', error);
+            console.error('❌ AJAX Error:', error);
             return false;
         }
     }
 
     /**
-     * 更新进度条
+     * Progress Bar UI Update
+     * Dynamically calculates and updates the width of the progress bar
      */
     function updateProgressBar(card, current, total) {
         const bar = card.querySelector('.progress-bar');
@@ -37,7 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 2. 主题管理 ---
+    // --- 2. Theme Management ---
+    
+    /**
+     * Initialize Theme
+     * Handles Dark/Light mode based on local storage or system preference
+     */
     function initTheme() {
         const savedTheme = localStorage.getItem(UI.storageKey);
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -55,10 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 3. 核心交互逻辑函数 ---
+    // --- 3. Core Interaction Logic ---
 
     /**
-     * [快速 +1 逻辑] - 补齐此功能
+     * Quick Progress Increment (+1 Logic)
+     * Increments current episode and triggers auto-sync
      */
     async function handleQuickPlus(btn) {
         const card = btn.closest('.card');
@@ -74,26 +83,27 @@ document.addEventListener('DOMContentLoaded', () => {
             curInput.value = cur;
             updateProgressBar(card, cur, tot);
             
-            // 提交数据
+            // Sync to database
             const success = await updateData({ 
                 update_id: id, 
                 current_ep: cur, 
                 total_eps: tot 
             });
 
-            // 联动逻辑：如果满了，自动改状态为“已看”
+            // Logic Linkage: Auto-update status to "Completed" if progress is full
             if (success && tot > 0 && cur >= tot) {
                 const statusSelect = card.querySelector('select[name="new_status"]');
                 if (statusSelect && statusSelect.value !== '已看') {
                     statusSelect.value = '已看';
-                    handleAutoSave(statusSelect); // 触发变色逻辑
+                    handleAutoSave(statusSelect); // Trigger status visual update
                 }
             }
         }
     }
 
     /**
-     * [通用自动保存逻辑]
+     * Universal Auto-Save Logic
+     * Handles updates for status, remarks, and links on input change
      */
     async function handleAutoSave(el) {
         const card = el.closest('.card');
@@ -114,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const success = await updateData(params);
 
+        // Update card visual state based on status selection
         if (success && el.name === 'new_status') {
             card.classList.remove('status-done', 'status-watching', 'status-uptodate');
             if (el.value === '已看') card.classList.add('status-done');
@@ -122,10 +133,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 4. 全局挂载函数 ---
+    // --- 4. Global Functions (Exposed to Window) ---
 
+    /**
+     * Delete Item with confirmation and scale-out animation
+     */
     window.deleteItem = function(id, btn) {
-        if (!confirm('确定要删除这个作品吗？')) return;
+        if (!confirm('Are you sure you want to delete this item?')) return;
         const card = btn.closest('.card');
         fetch('delete_item.php', {
             method: 'POST',
@@ -135,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(res => res.text())
         .then(data => {
             if (data.trim() === 'success') {
+                // UI feedback: smooth removal animation
                 card.style.transition = 'all 0.4s ease';
                 card.style.transform = 'scale(0.8)';
                 card.style.opacity = '0';
@@ -143,33 +158,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    /**
+     * Add Item via Form Submission
+     */
     window.addItem = function(event, form) {
         event.preventDefault();
         const btn = form.querySelector('button');
-        btn.innerText = '正在添加...';
+        btn.innerText = 'Adding...';
         btn.disabled = true;
         const formData = new FormData(form);
         fetch('confirm_add.php', { method: 'POST', body: formData })
         .then(res => res.text())
         .then(data => {
             if (data.trim() === 'SUCCESS') {
-                btn.innerText = '✅ 已成功';
+                btn.innerText = '✅ Success';
                 setTimeout(() => {
+                    // Refresh with timestamp to prevent cache issues
                     window.location.href = 'index.php?t=' + new Date().getTime();
                 }, 600);
             }
         });
     };
 
-    // --- 5. 事件委托 ---
+    // --- 5. Event Delegation ---
 
+    /**
+     * Change Event Listener
+     * Handles folder management and automatic data saving
+     */
     document.addEventListener('change', (e) => {
         const el = e.target;
         
+        // Folder management logic
         if (el.classList.contains('folder-logic')) {
             const id = el.closest('.card').querySelector('input[name="update_id"]').value;
             if (el.value === "NEW_FOLDER") {
-                const name = prompt("请输入新文件夹名称:");
+                const name = prompt("Enter new folder name:");
                 if (name?.trim()) {
                     window.location.href = `update_item.php?update_folder_id=${id}&new_folder=${encodeURIComponent(name)}`;
                 }
@@ -179,16 +203,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 包含链接输入框的自动保存
+        // Auto-save trigger for specific inputs
         if (el.matches('select, input:not([type="text"]), .remarks-input, .link-input')) {
             handleAutoSave(el);
         }
     });
 
+    /**
+     * Click Event Listener
+     * Handles Quick +1 and Link Toggle interactions
+     */
     document.addEventListener('click', (e) => {
         const el = e.target;
         
-        // --- 修正：真正调用加一逻辑 ---
         const plusBtn = el.closest('.mini-plus-btn');
         if (plusBtn) {
             handleQuickPlus(plusBtn);
@@ -202,12 +229,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    /**
+     * Keyboard Event Listener
+     * Blur link input and trigger save on Enter key
+     */
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && e.target.classList.contains('link-input')) {
-            e.target.blur(); 
+            e.target.blur(); // Triggers change event for saving
             e.target.classList.remove('show');
         }
     });
 
+    // Initialize logic on load
     initTheme();
 });
