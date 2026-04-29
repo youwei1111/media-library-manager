@@ -64,37 +64,45 @@ def get_search_results(name, media_type):
         except Exception as e:
             print(f"Bangumi API Deep Query Failed: {e}", file=sys.stderr)
 
-    # Logic for Books (using Google Books API with Open Library as fallback)
-    elif media_type == 'book':
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        google_url = f"https://www.googleapis.com/books/v1/volumes?q=intitle:{name}&maxResults=8"
+   elif media_type == 'book':
+        # Use a standard browser User-Agent to prevent request blocking
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        # Pre-process query: strip whitespace and hyphens to normalize ISBN strings
+        clean_query = name.strip().replace('-', '')
+        is_isbn = clean_query.isdigit() and len(clean_query) in [10, 13]
+        
         try:
-            response = requests.get(google_url, headers=headers, timeout=10)
-            res = response.json()
-            if 'items' in res:
-                for item in res['items']:
-                    vol = item.get('volumeInfo', {})
-                    # Normalizing rating to a 10-point scale
-                    raw_score = vol.get('averageRating', 0)
-                    score = float(raw_score) * 2 if raw_score else 0.0
-                    images = vol.get('imageLinks', {})
-                    poster = images.get('thumbnail') or images.get('smallThumbnail') or ""
-                    # Enforce HTTPS for secure asset loading
-                    if poster.startswith('http:'):
-                        poster = poster.replace('http:', 'https:')
+            # --- STEP 1: Precise ISBN Lookup via OpenLibrary API ---
+            if is_isbn:
+                # Using the OpenLibrary 'data' API for structured metadata retrieval
+                isbn_url = f"https://openlibrary.org/api/books?bibkeys=ISBN:{clean_query}&format=json&jscmd=data"
+                res = requests.get(isbn_url, timeout=8).json()
+                key = f"ISBN:{clean_query}"
+                
+                if key in res:
+                    data = res[key]
                     results.append({
-                        "title": vol.get('title'),
-                        "rating": score,
-                        "poster": poster,
-                        "summary": f"Authors: {', '.join(vol.get('authors', ['Unknown']))}",
+                        "title": data.get('title'),
+                        "rating": 0.0,
+                        "poster": data.get('cover', {}).get('large', ""),
+                        "summary": f"[ISBN Match] Authors: {', '.join([a['name'] for a in data.get('authors', [])]) if data.get('authors') else 'Unknown'}",
                         "type": 'book'
                     })
-            
-            # Fallback to Open Library if Google Books returns empty
-            if not results:
-                open_url = f"https://openlibrary.org/search.json?title={name}&limit=5"
-                ol_res = requests.get(open_url, timeout=10).json()
+
+            # --- STEP 2: General Keyword Search (OpenLibrary Hybrid) ---
+            # Fallback to search index if results are insufficient
+            if len(results) < 5:
+                ol_search_url = f"https://openlibrary.org/search.json?q={name}&limit=5"
+                ol_res = requests.get(ol_search_url, headers=headers, timeout=10).json()
+                
                 for doc in ol_res.get('docs', []):
+                    # Basic Deduplication: Skip if the title already exists in results
+                    if any(r['title'].lower() == doc.get('title', '').lower() for r in results):
+                        continue
+                        
                     cover_id = doc.get('cover_i')
                     results.append({
                         "title": doc.get('title'),
@@ -103,8 +111,40 @@ def get_search_results(name, media_type):
                         "summary": f"Authors: {', '.join(doc.get('author_name', ['Unknown']))}",
                         "type": 'book'
                     })
+
+            # --- STEP 3: Deep Supplement via Google Books API ---
+            # Google Books provides excellent coverage for non-English (especially Chinese) titles
+            if len(results) < 8:
+                # Use a broad query to maximize discovery
+                google_url = f"https://www.googleapis.com/books/v1/volumes?q={name}&maxResults=5"
+                g_response = requests.get(google_url, headers=headers, timeout=8)
+                
+                if g_response.status_code == 200:
+                    g_res = g_response.json()
+                    if 'items' in g_res:
+                        for item in g_res['items']:
+                            vol = item.get('volumeInfo', {})
+                            g_title = vol.get('title')
+                            
+                            # Deduplication check
+                            if any(r['title'].lower() == g_title.lower() for r in results):
+                                continue
+                            
+                            raw_score = vol.get('averageRating', 0)
+                            images = vol.get('imageLinks', {})
+                            
+                            results.append({
+                                "title": g_title,
+                                # Convert 5-star rating system to 10-point scale
+                                "rating": float(raw_score) * 2 if raw_score else 0.0,
+                                "poster": (images.get('thumbnail') or "").replace('http:', 'https:'),
+                                "summary": f"Source: Google | Authors: {', '.join(vol.get('authors', ['Unknown']))}",
+                                "type": 'book'
+                            })
+
         except Exception as e:
-            print(f"Book Search Service Error: {e}", file=sys.stderr)
+            # Error logging for debugging purposes
+            print(f"Book Hybrid Search Error: {e}", file=sys.stderr)
                 
     return results
 
