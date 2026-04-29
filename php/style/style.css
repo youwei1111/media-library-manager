@@ -1,5 +1,5 @@
 /* =========================================
-   1. 基础变量与主题切换 (全系统适配)
+   1. Base Variables & Theme Management
    ========================================= */
 :root {
     --bg-color: #f0f2f5;
@@ -11,7 +11,7 @@
     --nav-bg: #ffffff;
     --success-color: #2ecc71;
     --accent-color: #3498db;
-    --uptodate-color: #9b59b6; /* 追平状态专属紫色 */
+    --uptodate-color: #9b59b6; /* Purple for "Up to Date" status */
     --shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
@@ -36,11 +36,11 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* 强制修正链接颜色 */
+/* Force fix link colors */
 a { text-decoration: none; color: inherit !important; }
 
 /* =========================================
-   2. 顶部搜索栏美化
+   2. Search Bar Styling
    ========================================= */
 .nav-section {
     background: var(--nav-bg);
@@ -99,7 +99,7 @@ a { text-decoration: none; color: inherit !important; }
 }
 
 /* =========================================
-   3. 过滤器与状态栏 (已调整间距)
+   3. Filters & Status Bar
    ========================================= */
 .nav { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .nav-link {
@@ -116,7 +116,7 @@ a { text-decoration: none; color: inherit !important; }
 }
 
 .status-bar {
-    margin: 0 0 20px 5px; /* 显著增加底部间距 */
+    margin: 0 0 20px 5px; 
     padding: 5px 15px;
     font-size: 14px;
     border-left: 4px solid var(--success-color);
@@ -127,7 +127,7 @@ a { text-decoration: none; color: inherit !important; }
 .status-bar strong { font-size: 18px; color: #e74c3c; }
 
 /* =========================================
-   4. 卡片与海报修复
+   4. Card & Poster Styling
    ========================================= */
 .grid {
     display: grid;
@@ -167,7 +167,7 @@ a { text-decoration: none; color: inherit !important; }
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* 标签样式 */
+/* Badge Styles */
 .type-tag {
     position: absolute; bottom: 10px; right: 10px;
     background: rgba(0, 0, 0, 0.6);
@@ -183,16 +183,15 @@ a { text-decoration: none; color: inherit !important; }
 }
 
 /* =========================================
-   5. 表单与集数
+   5. Information & Episodes
    ========================================= */
 .info { 
     padding: 18px; 
     flex-grow: 1; 
     display: flex; 
     flex-direction: column; 
-    gap: 10px; box-sizing: 
-    border-box !important;
-    flex: 1 !important; 
+    gap: 10px; 
+    box-sizing: border-box !important;
     min-height: 180px;
 }
 
@@ -206,10 +205,10 @@ a { text-decoration: none; color: inherit !important; }
     font-size: 13px; margin-bottom: 5px;
 }
 
-/* 针对备注框的溢出修复 */
+/* Fixed overflow for remarks textarea */
 .remarks-input {
     width: 100% !important; 
-    box-sizing: border-box !important; /* 强制内边距不撑大宽度 */
+    box-sizing: border-box !important;
     max-width: 100% !important;
     display: block;
     flex-grow: 1 !important;
@@ -244,15 +243,21 @@ a { text-decoration: none; color: inherit !important; }
 .progress-bar { background: linear-gradient(90deg, var(--success-color), #27ae60); height: 100%; transition: 0.4s; }
 
 /* =========================================
-   6. 状态特有样式 (追平、已看、在看)
+   6. Status-Specific Styles (Done, Watching, Up-to-date)
    ========================================= */
-/* 在看状态 */
+
+/* Watching Status */
 .card.status-watching { border: 2px solid var(--success-color); }
 
-/* 已看状态 */
+/* Completed (Done) Status - Hiding progress and episode info */
 .card.status-done { opacity: 0.6; filter: grayscale(0.5); }
+.card.status-done .progress-container,
+.card.status-done .ep-row,            /* Hides the entire episode row */
+.card.status-done .mini-plus-btn {
+    display: none !important;
+}
 
-/* 追平状态 (B方案) */
+/* Up-to-Date Status */
 .card.status-uptodate { border: 2px solid var(--uptodate-color); }
 .card.status-uptodate::before {
     content: "UP TO DATE";
@@ -264,28 +269,29 @@ a { text-decoration: none; color: inherit !important; }
     padding: 3px 8px; border-radius: 4px;
     z-index: 10;
 }
-/* 追平时隐藏原本的更新标签，避免重叠 */
+
+/* Hide original update badge when up-to-date to prevent overlap */
 .card.status-uptodate .update-badge { display: none; }
 
-/* 当卡片处于追平状态时，强制进度条满格 */
+/* Force full progress bar for up-to-date status */
 .card.status-uptodate .progress-bar {
     width: 100% !important;
-    background: linear-gradient(90deg, var(--uptodate-color), #8e44ad) !important; /* 换成紫色系更丝滑 */
+    background: linear-gradient(90deg, var(--uptodate-color), #8e44ad) !important;
 }
 
-/* 2. 隐藏集数输入区域 (包含 +1 按钮、数字框、斜杠和总集数) */
+/* Hide episode input row for up-to-date status */
 .card.status-uptodate .ep-row {
     display: none !important;
 }
 
 /* =========================================
-   7. 底部操作与链接展开
+   7. Card Footer & Expandable Link
    ========================================= */
 .card-footer {
     padding: 10px 5px 0px 5px;
     border-top: 1px solid var(--border-color);
     display: flex; align-items: center; justify-content: space-between;
-    margin-top: auto !important; /* 自动外边距会将 footer 推至最下 */
+    margin-top: auto !important; 
     background: var(--card-bg);
     width: 100%;
     box-sizing: border-box;
@@ -310,7 +316,6 @@ a { text-decoration: none; color: inherit !important; }
 }
 
 .delete-icon-btn { color: #ccc; font-size: 18px; margin-left: 15px; transition: 0.2s; }
-/* style.css */
 .delete-icon-btn:hover {
     color: #e74c3c !important;
     transform: scale(1.2);
@@ -318,7 +323,7 @@ a { text-decoration: none; color: inherit !important; }
 }
 
 /* =========================================
-   8. 固定浮动按钮
+   8. Floating Action Buttons
    ========================================= */
 .fixed-actions {
     position: fixed; bottom: 30px; right: 30px;
