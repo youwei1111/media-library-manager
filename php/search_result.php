@@ -58,7 +58,9 @@ if ($check_res) {
             $is_added = in_array($current_key, $existing_keys);
         ?>
             <div class="search-item">
-                <img src="<?php echo $item['poster'] ?: 'https://via.placeholder.com/200x280?text=No+Image'; ?>" alt="Poster Preview">
+                <?php if (!empty($item['poster'])): ?>
+                    <img src="<?php echo htmlspecialchars($item['poster']); ?>" alt="Poster">
+                <?php endif; ?>
                 
                 <div class="info">
                     <h3>
