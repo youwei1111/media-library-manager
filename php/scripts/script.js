@@ -240,6 +240,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    /**
+     * Dynamic Search Placeholder Handler
+     * Updates the search input hint based on the selected media type.
+     */
+    document.addEventListener('DOMContentLoaded', () => {
+        const typeSelect = document.getElementById('media-type-select');
+        const searchInput = document.getElementById('search-input');
+    
+        // Ensure elements exist before adding listeners
+        if (typeSelect && searchInput) {
+            const placeholders = {
+                'book': '🔍 Enter Title, Author, or ISBN (e.g., 978...)',
+                'movie': '🔍 Enter Movie Title...',
+                'tv': '🔍 Enter TV Show Title...',
+                'anime': '🔍 Enter Anime Name...',
+                'manga': '🔍 Enter Manga Title or Bangumi ID...'
+            };
+    
+            // Listen for changes in the dropdown menu
+            typeSelect.addEventListener('change', (e) => {
+                const selectedType = e.target.value;
+                // Apply the corresponding placeholder or fallback to a default string
+                searchInput.placeholder = placeholders[selectedType] || '🔍 Search for media...';
+            });
+        }
+    });
+
     // Initialize logic on load
     initTheme();
 });
