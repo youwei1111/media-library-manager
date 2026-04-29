@@ -61,7 +61,7 @@ a { text-decoration: none; color: inherit !important; }
 
 .search-form {
     display: grid;
-    grid-template-columns: 1fr 200px 140px; 
+    grid-template-columns: 200px 1fr 140px; ; 
     gap: 15px;
 }
 
