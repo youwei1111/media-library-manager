@@ -1,13 +1,22 @@
 <?php
-// 这是一个配置模板，请将其重命名为 db_config.php 并填写你的信息
-$host = 'localhost';
-$user = 'YOUR_USERNAME';      // 比如 root
-$pass = 'YOUR_PASSWORD';      // 你的数据库密码
+/**
+ * DATABASE CONFIGURATION TEMPLATE
+ * * Instructions:
+ * 1. Rename this file to 'db_config.php'
+ * 2. Update the credentials below with your local MySQL settings
+ * 3. Ensure 'db_config.php' is added to your .gitignore to keep your credentials secure
+ */
+
+$host   = 'localhost';
+$user   = 'YOUR_USERNAME';      // Example: 'root'
+$pass   = 'YOUR_PASSWORD';      // Your MySQL password
 $dbname = 'media_library_system';
 
+// Create database connection
 $conn = new mysqli($host, $user, $pass, $dbname);
 
+// Check connection and terminate on failure
 if ($conn->connect_error) {
-    die("连接失败: " . $conn->connect_error);
+    die("Connection Failed: " . $conn->connect_error);
 }
 ?>
