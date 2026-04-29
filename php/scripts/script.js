@@ -102,36 +102,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Universal Auto-Save Logic
-     * Handles updates for status, remarks, and links on input change
-     */
-    async function handleAutoSave(el) {
-        const card = el.closest('.card');
-        const idContainer = el.closest('form') || card;
-        const id = idContainer.querySelector('input[name="update_id"]').value;
-        
-        const params = { update_id: id };
-        
-        if (el.classList.contains('ep-input')) {
-            const cur = idContainer.querySelector('input[name="current_ep"]').value;
-            const tot = idContainer.querySelector('input[name="total_eps"]').value;
-            params.current_ep = cur;
-            params.total_eps = tot;
-            updateProgressBar(card, cur, tot);
-        } else {
-            params[el.name] = el.value;
-        }
+ * Core Auto-Save Handler
+ * Synchronizes frontend changes with the PHP backend via AJAX.
+ * @param {HTMLElement} el - The input or select element triggering the change.
+ */
+async function handleAutoSave(el) {
+    // 1. Locate the parent card to scope the update
+    const card = el.closest('.card');
+    if (!card) return; 
 
-        const success = await updateData(params);
+    // 2. Retrieve the unique database ID for the specific item
+    const idEl = card.querySelector('input[name="update_id"]');
+    if (!idEl) return; 
 
-        // Update card visual state based on status selection
-        if (success && el.name === 'new_status') {
-            card.classList.remove('status-done', 'status-watching', 'status-uptodate');
-            if (el.value === '已看') card.classList.add('status-done');
-            if (el.value === '在看') card.classList.add('status-watching');
-            if (el.value === '追平') card.classList.add('status-uptodate');
-        }
+    const id = idEl.value;
+    const params = { update_id: id };
+    
+    // 3. Logic Branch: Handle Episode Progress vs. General Attributes
+    if (el.classList.contains('ep-input')) {
+        const curEl = card.querySelector('input[name="current_ep"]');
+        const totEl = card.querySelector('input[name="total_eps"]');
+        
+        const cur = curEl ? curEl.value : 0;
+        const tot = totEl ? totEl.value : 0;
+        
+        params.current_ep = cur;
+        params.total_eps = tot;
+        
+        // Update the visual progress bar immediately (Optimistic UI)
+        updateProgressBar(card, cur, tot);
+    } else {
+        // Map dynamic attributes like 'new_status', 'remarks', or 'new_link'
+        params[el.name] = el.value;
     }
+
+    // 4. Asynchronous Backend Synchronization
+    const isSuccess = await updateData(params); 
+
+    // 5. Reactive UI: Update card styling based on the new status
+    if (isSuccess && el.name === 'new_status') {
+        const statusClasses = ['status-done', 'status-watching', 'status-uptodate'];
+        card.classList.remove(...statusClasses);
+
+        if (el.value === '已看') card.classList.add('status-done');
+        if (el.value === '在看') card.classList.add('status-watching');
+        if (el.value === '追平') card.classList.add('status-uptodate');
+    }
+}
 
     // --- 4. Global Functions (Exposed to Window) ---
 
@@ -221,11 +238,30 @@ document.addEventListener('DOMContentLoaded', () => {
             handleQuickPlus(plusBtn);
         }
 
-        if (el.closest('.link-toggle-btn')) {
-            const wrapper = el.closest('.link-wrapper');
-            const input = wrapper.querySelector('.link-input');
-            input.classList.toggle('show');
-            if (input.classList.contains('show')) input.focus();
+        /**
+         * Link Toggle & Auto-Persistence Logic
+         * Handles the visibility and background saving of external media links.
+         */
+        const linkToggleBtn = el.closest('.link-toggle-btn');
+        
+        if (linkToggleBtn) {
+            // Navigate to the shared parent container (.card-footer)
+            const wrapper = linkToggleBtn.closest('.card-footer'); 
+            
+            if (wrapper) {
+                const input = wrapper.querySelector('.link-input');
+                if (input) {
+                    // Toggle visibility class
+                    input.classList.toggle('show'); 
+                    
+                    if (input.classList.contains('show')) {
+                        input.focus(); // Instant UX: ready to type
+                    } else {
+                        // Background Sync: Save data when the UI is closed
+                        handleAutoSave(input); 
+                    }
+                }
+            }
         }
     });
 
